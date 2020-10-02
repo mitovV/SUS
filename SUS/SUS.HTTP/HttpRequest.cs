@@ -12,7 +12,7 @@
             this.Cookies = new List<Cookie>();
             this.Headers = new List<Header>();
 
-            var lines = requesString.Split(new string[] { HttpConstants.NewLine }, System.StringSplitOptions.None);
+            var lines = requesString.Split(new string[] { HttpConstants.NewLine }, StringSplitOptions.None);
 
             var headerLine = lines[0];
 
