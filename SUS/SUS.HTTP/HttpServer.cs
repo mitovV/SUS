@@ -67,20 +67,24 @@
                     }
                 }
 
-                var dataAsString = Encoding.UTF8.GetString(data.ToArray());
-                var html = $"<h1>Hello from CustomServer {DateTime.Now}</h1>";
+                var requestAsString = Encoding.UTF8.GetString(data.ToArray());
 
-                var request = new HttpRequest(dataAsString);
+                var request = new HttpRequest(requestAsString);
+                Console.WriteLine($"{request.Method} {request.Path} => {request.Headers.Count} headers");
 
-                var responseBodyBytes = Encoding.UTF8.GetBytes(html);
-                var response = new HttpResponse("text/html; charset=utf-8", responseBodyBytes);
-                response.Headers.Add(new Header("Server", "SUS Server 1.1"));
-                response.Cookies.Add(new ResponseCookie("sid", Guid.NewGuid().ToString()) 
-                { 
-                    HttpOnly = true,
-                    MaxAge = 3 * 60 * 60
-                });
-               
+                HttpResponse response;
+
+                if (this.routeTable.ContainsKey(request.Path))
+                {
+                    var action = this.routeTable[request.Path];
+
+                    response = action(request);
+                }
+                else
+                {
+                    response = new HttpResponse("text/html", null, HttpStatusCode.NotFound);
+                }
+
                 var responseHeaderBytes = Encoding.UTF8.GetBytes(response.ToString());
 
                 await stream.WriteAsync(responseHeaderBytes, 0, responseHeaderBytes.Length);
