@@ -1,5 +1,7 @@
 ﻿namespace SUS.HTTP
 {
+    using System;
+
     public class Header
     {
         public Header(string name, string value)
@@ -10,7 +12,7 @@
 
         public Header(string headerLine)
         {
-            var headerParts = headerLine.Split(new char[] { ' ' }, 2);
+            var headerParts = headerLine.Split(new string[] { ": " }, 2, StringSplitOptions.None);
             this.Name = headerParts[0];
             this.Value = headerParts[1];
         }

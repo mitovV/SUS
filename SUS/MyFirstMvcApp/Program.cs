@@ -16,7 +16,7 @@
             await server.StartAsync(80);
         }
 
-        private static HttpRespose HomePage(HttpRequest arg)
+        private static HttpResponse HomePage(HttpRequest arg)
         {
             throw new NotImplementedException();
         }

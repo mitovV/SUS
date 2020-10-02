@@ -4,14 +4,15 @@
     using System.Collections.Generic;
     using System.Net;
     using System.Net.Sockets;
+    using System.Text;
     using System.Threading.Tasks;
 
     public class HttpServer : IHttpServer
     {
-        private readonly IDictionary<string, Func<HttpRequest, HttpRespose>> routeTable
-           = new Dictionary<string, Func<HttpRequest, HttpRespose>>();
+        private readonly IDictionary<string, Func<HttpRequest, HttpResponse>> routeTable
+           = new Dictionary<string, Func<HttpRequest, HttpResponse>>();
 
-        public void AddRoute(string path, Func<HttpRequest, HttpRespose> action)
+        public void AddRoute(string path, Func<HttpRequest, HttpResponse> action)
         {
             if (this.routeTable.ContainsKey(path))
             {
@@ -64,6 +65,26 @@
                         data.AddRange(buffer);
                     }
                 }
+
+                var dataAsString = Encoding.UTF8.GetString(data.ToArray());
+                var html = $"<h1>Hello from CustomServer {DateTime.Now}</h1>";
+                var request = new HttpRequest(dataAsString);
+                var response = "HTTP/1.1 200 OK" + HttpConstants.NewLine +
+                    "Server: CustomServer 2020" + HttpConstants.NewLine +
+                    // "Location: https://google.com" + NewLine +
+                    "Content-Type: text/html; charset=utf-8" + HttpConstants.NewLine +
+                    "Set-Cookie: language=bg" + HttpConstants.NewLine +
+                    "Set-Cookie: sid=12345ggj; Secure; HttpOnly" + HttpConstants.NewLine +
+                    //"Set-Cookie: test=value; Max-Age=" + 20 + NewLine +
+                    //"Set-Cookie: test=pathCookie; Path=/test" + NewLine +
+                    $"Content-Length: {html.Length}" + HttpConstants.NewLine +
+                    HttpConstants.NewLine +
+                    html +
+                    HttpConstants.NewLine;
+
+                var responseBytes = Encoding.UTF8.GetBytes(response);
+
+                await stream.WriteAsync(responseBytes,0, responseBytes.Length);
             }
 
             tcpClient.Close();
