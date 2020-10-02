@@ -85,6 +85,8 @@
                     response = new HttpResponse("text/html", null, HttpStatusCode.NotFound);
                 }
 
+                response.Headers.Add(new Header("Server","SUS Server 1.1"));
+
                 var responseHeaderBytes = Encoding.UTF8.GetBytes(response.ToString());
 
                 await stream.WriteAsync(responseHeaderBytes, 0, responseHeaderBytes.Length);
