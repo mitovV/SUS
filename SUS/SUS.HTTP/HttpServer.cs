@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Net;
     using System.Net.Sockets;
     using System.Text;
@@ -68,23 +69,22 @@
 
                 var dataAsString = Encoding.UTF8.GetString(data.ToArray());
                 var html = $"<h1>Hello from CustomServer {DateTime.Now}</h1>";
+
                 var request = new HttpRequest(dataAsString);
-                var response = "HTTP/1.1 200 OK" + HttpConstants.NewLine +
-                    "Server: CustomServer 2020" + HttpConstants.NewLine +
-                    // "Location: https://google.com" + NewLine +
-                    "Content-Type: text/html; charset=utf-8" + HttpConstants.NewLine +
-                    "Set-Cookie: language=bg" + HttpConstants.NewLine +
-                    "Set-Cookie: sid=12345ggj; Secure; HttpOnly" + HttpConstants.NewLine +
-                    //"Set-Cookie: test=value; Max-Age=" + 20 + NewLine +
-                    //"Set-Cookie: test=pathCookie; Path=/test" + NewLine +
-                    $"Content-Length: {html.Length}" + HttpConstants.NewLine +
-                    HttpConstants.NewLine +
-                    html +
-                    HttpConstants.NewLine;
 
-                var responseBytes = Encoding.UTF8.GetBytes(response);
+                var responseBodyBytes = Encoding.UTF8.GetBytes(html);
+                var response = new HttpResponse("text/html; charset=utf-8", responseBodyBytes);
+                response.Headers.Add(new Header("Server", "SUS Server 1.1"));
+                response.Cookies.Add(new ResponseCookie("sid", Guid.NewGuid().ToString()) 
+                { 
+                    HttpOnly = true,
+                    MaxAge = 3 * 60 * 60
+                });
+               
+                var responseHeaderBytes = Encoding.UTF8.GetBytes(response.ToString());
 
-                await stream.WriteAsync(responseBytes,0, responseBytes.Length);
+                await stream.WriteAsync(responseHeaderBytes, 0, responseHeaderBytes.Length);
+                await stream.WriteAsync(response.Body, 0, response.Body.Length);
             }
 
             tcpClient.Close();
