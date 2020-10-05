@@ -17,6 +17,7 @@
 
             server.AddRoute("/", new HomeController().Index);
             server.AddRoute("/favicon.ico", new StaticFilesController().Favico);
+            server.AddRoute("/users/login", new UsersController().Login);
 
             await server.StartAsync(80);
         }

@@ -73,9 +73,9 @@
 
                 HttpResponse response;
 
-                if (this.routeTable.ContainsKey(request.Path))
+                if (this.routeTable.ContainsKey(request.Path.ToLower()))
                 {
-                    var action = this.routeTable[request.Path];
+                    var action = this.routeTable[request.Path.ToLower()];
 
                     response = action(request);
                 }
