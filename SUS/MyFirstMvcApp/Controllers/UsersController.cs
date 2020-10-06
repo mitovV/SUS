@@ -6,12 +6,9 @@
     public class UsersController : Controller
     {
         public HttpResponse Login(HttpRequest request)
-        {
-            return this.View();
-        }
+        => this.View();
+
         public HttpResponse Register(HttpRequest request)
-        {
-            return this.View();
-        }
+        => this.View();
     }
 }

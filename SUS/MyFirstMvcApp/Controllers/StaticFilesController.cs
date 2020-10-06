@@ -6,8 +6,9 @@
     public class StaticFilesController : Controller
     {
         public HttpResponse Favico(HttpRequest request)
-        {
-            return this.File("wwwroot/favicon.ico", "image/x-icon");
-        }
+            => this.File("wwwroot/favicon.ico", "image/x-icon");
+
+        public HttpResponse SiteCss(HttpRequest request)
+            => this.File("wwwroot/css/site.css", "text/css");
     }
 }

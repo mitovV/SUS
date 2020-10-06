@@ -9,8 +9,13 @@
     {
         public HttpResponse View([CallerMemberName] string path = null)
         {
-            var responseText = System.IO.File.ReadAllText("Views/" + this.GetType().Name.Replace("Controller", string.Empty) + "/" + path + ".html");
-            var responseBody = Encoding.UTF8.GetBytes(responseText);
+            var main = System.IO.File.ReadAllText("Views/Shared/_Layout.html");
+
+            var viewContent = System.IO.File.ReadAllText("Views/" + this.GetType().Name.Replace("Controller", string.Empty) + "/" + path + ".html");
+
+           var  responseHtml = main.Replace("@RenderBody()", viewContent);
+
+            var responseBody = Encoding.UTF8.GetBytes(responseHtml);
 
             var response = new HttpResponse("text/html", responseBody);
 
