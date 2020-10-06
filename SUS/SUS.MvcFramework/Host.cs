@@ -1,9 +1,9 @@
 ﻿namespace SUS.MvcFramework
 {
-    using SUS.HTTP;
-
     using System.Collections.Generic;
     using System.Threading.Tasks;
+
+    using SUS.HTTP;
 
     public class Host
     {
