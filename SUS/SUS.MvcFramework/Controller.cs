@@ -30,5 +30,13 @@
 
             return response;
         }
+
+        public HttpResponse Redirect(string path)
+        {
+            var response = new HttpResponse(HttpStatusCode.Found);
+            response.Headers.Add(new Header("Location", path));
+
+            return response;
+        }
     }
 }
