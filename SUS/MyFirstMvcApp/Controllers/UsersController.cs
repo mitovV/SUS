@@ -11,7 +11,7 @@
         public HttpResponse Register(HttpRequest request)
             => this.View();
 
-        public HttpResponse DoRegister(HttpRequest arg)
+        public HttpResponse DoRegister(HttpRequest request)
             => this.Redirect("/");
     }
 }

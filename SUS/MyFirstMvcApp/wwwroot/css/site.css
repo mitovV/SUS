@@ -12,6 +12,10 @@
     list-style-type: none;
 }
 
-.nav li {
-    padding: 2px;
+    .nav li {
+        padding: 2px;
+    }
+
+.footer {
+    margin-top: 10px;
 }
