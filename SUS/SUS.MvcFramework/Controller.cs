@@ -5,15 +5,27 @@
 
     using SUS.HTTP;
 
+    using ViewEngine;
+
     public abstract class Controller
     {
-        public HttpResponse View([CallerMemberName] string path = null)
+        private SusViewEngine viewEngine;
+
+        public Controller()
+        {
+            this.viewEngine = new SusViewEngine();
+        }
+
+        public HttpResponse View(object viewModel = null, [CallerMemberName] string path = null)
         {
             var main = System.IO.File.ReadAllText("Views/Shared/_Layout.html");
+            main = main.Replace("@RenderBody()", "__VIEW__");
+            main = viewEngine.GetHtml(main, viewModel);
 
             var viewContent = System.IO.File.ReadAllText("Views/" + this.GetType().Name.Replace("Controller", string.Empty) + "/" + path + ".html");
 
-           var  responseHtml = main.Replace("@RenderBody()", viewContent);
+            viewContent = this.viewEngine.GetHtml(viewContent, viewModel);
+            var responseHtml = main.Replace("__VIEW__", viewContent);
 
             var responseBody = Encoding.UTF8.GetBytes(responseHtml);
 
