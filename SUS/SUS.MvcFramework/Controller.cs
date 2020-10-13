@@ -34,15 +34,6 @@
             return response;
         }
 
-        public HttpResponse File(string path, string type)
-        {
-            var fileBytes = System.IO.File.ReadAllBytes(path);
-
-            var response = new HttpResponse(type, fileBytes);
-
-            return response;
-        }
-
         public HttpResponse Redirect(string path)
         {
             var response = new HttpResponse(HttpStatusCode.Found);
