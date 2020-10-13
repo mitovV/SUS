@@ -4,17 +4,18 @@
     using System.Text;
 
     using SUS.HTTP;
-
     using ViewEngine;
 
     public abstract class Controller
     {
-        private SusViewEngine viewEngine;
+        private readonly SusViewEngine viewEngine;
 
         public Controller()
         {
             this.viewEngine = new SusViewEngine();
         }
+
+        public HttpRequest HttpRequest { get; set; }
 
         public HttpResponse View(object viewModel = null, [CallerMemberName] string path = null)
         {

@@ -6,15 +6,15 @@
     public class UsersController : Controller
     {
         [HttpGet]
-        public HttpResponse Login(HttpRequest request)
+        public HttpResponse Login()
             => this.View();
 
         [HttpGet]
-        public HttpResponse Register(HttpRequest request)
+        public HttpResponse Register()
             => this.View();
 
-        [HttpPost("users/register")]
-        public HttpResponse DoRegister(HttpRequest request)
+        [HttpPost("/users/register")]
+        public HttpResponse DoRegister()
             => this.Redirect("/");
     }
 }

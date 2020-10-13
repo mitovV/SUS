@@ -66,8 +66,9 @@
 
                     var route = new Route(url, httpMethod, (reques) =>
                      {
-                         var instance = Activator.CreateInstance(controllerType);
-                         var response = method.Invoke(instance, new object[] { reques }) as HttpResponse;
+                         var instance = Activator.CreateInstance(controllerType) as Controller;
+                         instance.HttpRequest = reques;
+                         var response = method.Invoke(instance, new object[] {  }) as HttpResponse;
 
                          return response;
                      });
