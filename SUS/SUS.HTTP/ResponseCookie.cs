@@ -12,16 +12,24 @@
 
         public bool HttpOnly { get; set; }
 
+        public string Path { get; set; }
+
         public override string ToString()
         {
             var sb = new StringBuilder();
 
             sb.Append($"{this.Name}={this.Value}");
 
+            if (this.Path != null)
+            {
+                sb.Append($"; Path={this.Path}");
+            }
+
             if (MaxAge != 0)
             {
                 sb.Append($"; Max-Age={this.MaxAge}");
             }
+
 
             if (HttpOnly)
             {

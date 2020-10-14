@@ -78,6 +78,16 @@
                 }
 
                 response.Headers.Add(new Header("Server", "SUS Server 1.1"));
+                var sessionCookie = request.Cookies.FirstOrDefault(x => x.Name == HttpConstants.SessionCookieName);
+
+                if (sessionCookie != null)
+                {
+                    var responseCookie = new ResponseCookie(sessionCookie.Name, sessionCookie.Value)
+                    {
+                        Path = "/"
+                    };
+                    response.Cookies.Add(responseCookie);
+                }
 
                 var responseHeaderBytes = Encoding.UTF8.GetBytes(response.ToString());
 

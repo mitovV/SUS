@@ -8,6 +8,9 @@
 
     public class HttpRequest
     {
+        private static IDictionary<string, Dictionary<string, string>> Sessions
+            = new Dictionary<string, Dictionary<string, string>>();
+
         public HttpRequest(string requesString)
         {
             this.Cookies = new List<Cookie>();
@@ -58,6 +61,20 @@
                 }
             }
 
+            var sessionCookie = this.Cookies.FirstOrDefault(x => x.Name == HttpConstants.SessionCookieName);
+
+            if (sessionCookie == null || !Sessions.ContainsKey(sessionCookie.Value))
+            {
+                var sesionId = Guid.NewGuid().ToString();
+                this.Session = new Dictionary<string, string>();
+                Sessions.Add(sesionId, this.Session);
+                this.Cookies.Add(new Cookie(HttpConstants.SessionCookieName, sesionId));
+            }
+            else
+            {
+                this.Session = Sessions[sessionCookie.Value];
+            }
+
             this.Body = bodyBuilder.ToString();
 
             var parameters = this.Body.Split(new char[] { '&' }, StringSplitOptions.RemoveEmptyEntries);
@@ -77,6 +94,8 @@
         }
 
         public string Path { get; set; }
+
+        public Dictionary<string,string> Session { get; set; }
 
         public IDictionary<string, string> FormData { get; set; }
 
