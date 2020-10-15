@@ -3,6 +3,8 @@
     using SUS.HTTP;
     using SUS.MvcFramework;
 
+    using ViewModels.Users;
+
     public class UsersController : Controller
     {
         [HttpGet]
@@ -14,7 +16,9 @@
             => this.View();
 
         [HttpPost("/users/register")]
-        public HttpResponse DoRegister()
-            => this.Redirect("/");
+        public HttpResponse DoRegister(RegisterInputModel model)
+        {
+            return this.Redirect("/");
+        }
     }
 }

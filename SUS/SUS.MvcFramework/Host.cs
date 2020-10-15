@@ -2,8 +2,10 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel.Design;
     using System.IO;
     using System.Linq;
+    using System.Reflection;
     using System.Threading.Tasks;
 
     using HTTP;
@@ -65,18 +67,62 @@
                     }
 
 
-                    var route = new Route(url, httpMethod, (reques) =>
-                     {
-                         var instance = serviceCollection.CreateInstance(controllerType) as Controller;
-                         instance.HttpRequest = reques;
-                         var response = method.Invoke(instance, new object[] {  }) as HttpResponse;
-
-                         return response;
-                     });
+                    var route = new Route(url, httpMethod, (request) => ExecuteAction(request, serviceCollection, controllerType, method));
 
                     routeTable.Add(route);
                 }
             }
+        }
+
+        private static HttpResponse ExecuteAction(HttpRequest request, IServiceCollection serviceCollection, Type controllerType, MethodInfo method)
+        {
+            var instance = serviceCollection.CreateInstance(controllerType) as Controller;
+            instance.HttpRequest = request;
+
+            var arguments = new List<object>();
+
+            var parameters = method.GetParameters();
+
+            foreach (var parameter in parameters)
+            {
+                var httpParameterValue = GetParameterFromRequest(request, parameter.Name);
+                var parameterValue = Convert.ChangeType(httpParameterValue, parameter.ParameterType);
+
+                if (parameterValue == null && parameter.ParameterType != typeof(string))
+                {
+                    parameterValue = Activator.CreateInstance(parameter.ParameterType);
+
+                    var properties = parameter.ParameterType.GetProperties();
+
+                    foreach (var property in properties)
+                    {
+                        httpParameterValue = GetParameterFromRequest(request, property.Name);
+                        var propertyParameterValue = Convert.ChangeType(httpParameterValue, property.PropertyType);
+                        property.SetValue(parameterValue, propertyParameterValue);
+                    }
+                }
+
+                arguments.Add(parameterValue);
+            }
+
+            var response = method.Invoke(instance, arguments.ToArray()) as HttpResponse;
+
+            return response;
+        }
+
+        private static string GetParameterFromRequest(HttpRequest request, string parameterName)
+        {
+            if (request.FormData.Any(x => x.Key.ToLower() == parameterName.ToLower()))
+            {
+                return request.FormData.FirstOrDefault(x => x.Key.ToLower() == parameterName.ToLower()).Value;
+            }
+
+            if (request.QueryData.Any(x => x.Key.ToLower() == parameterName.ToLower()))
+            {
+                return request.QueryData.FirstOrDefault(x => x.Key.ToLower() == parameterName.ToLower()).Value;
+            }
+
+            return null;
         }
 
         private static void AutoRegisterStaticFiles(List<Route> routeTable)
