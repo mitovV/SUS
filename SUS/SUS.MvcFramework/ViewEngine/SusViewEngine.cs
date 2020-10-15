@@ -117,6 +117,16 @@ namespace ViewNamespace
 
             if (viewModel != null)
             {
+                if (viewModel.GetType().IsGenericType)
+                {
+                    var genericArguments = viewModel.GetType().GetGenericArguments();
+
+                    foreach (var genericArgument in genericArguments)
+                    {
+                        compileResult = compileResult.AddReferences(MetadataReference.CreateFromFile(genericArgument.Assembly.Location));
+                    }
+                }
+
                 compileResult = compileResult.AddReferences(MetadataReference.CreateFromFile(viewModel.GetType().Assembly.Location));
             }
 
@@ -129,25 +139,23 @@ namespace ViewNamespace
 
             compileResult = compileResult.AddSyntaxTrees(SyntaxFactory.ParseSyntaxTree(charpCode));
 
-            using (var memoryStream = new MemoryStream())
+            using var memoryStream = new MemoryStream();
+            var result = compileResult.Emit(memoryStream);
+
+            if (!result.Success)
             {
-                var result = compileResult.Emit(memoryStream);
-
-                if (!result.Success)
-                {
-                    return new ErrorView(result.Diagnostics
-                        .Where(x => x.Severity == DiagnosticSeverity.Error)
-                        .Select(x => x.GetMessage()), charpCode);
-                }
-
-                memoryStream.Seek(0, SeekOrigin.Begin);
-
-                var byteAssembly = memoryStream.ToArray();
-                var assembly = Assembly.Load(byteAssembly);
-                var viewType = assembly.GetType("ViewNamespace.ViewClass");
-                var instance = Activator.CreateInstance(viewType);
-                return instance as IView;
+                return new ErrorView(result.Diagnostics
+                    .Where(x => x.Severity == DiagnosticSeverity.Error)
+                    .Select(x => x.GetMessage()), charpCode);
             }
+
+            memoryStream.Seek(0, SeekOrigin.Begin);
+
+            var byteAssembly = memoryStream.ToArray();
+            var assembly = Assembly.Load(byteAssembly);
+            var viewType = assembly.GetType("ViewNamespace.ViewClass");
+            var instance = Activator.CreateInstance(viewType);
+            return instance as IView;
         }
     }
 }
