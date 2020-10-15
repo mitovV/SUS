@@ -3,8 +3,7 @@
     using System.Runtime.CompilerServices;
     using System.Text;
 
-    using SUS.HTTP;
-
+    using HTTP;
     using ViewEngine;
 
     public abstract class Controller
@@ -17,7 +16,7 @@
             this.viewEngine = new SusViewEngine();
         }
 
-        protected HttpRequest HttpRequest { get; set; }
+        public HttpRequest HttpRequest { get; set; }
 
         protected HttpResponse View(object viewModel = null, [CallerMemberName] string path = null)
         {
@@ -56,6 +55,7 @@
                 && this.HttpRequest.Session[UserIdSessionName] != null;
 
         protected string GetUserId()
-            => this.HttpRequest.Session[UserIdSessionName];
+            => this.HttpRequest.Session.ContainsKey(UserIdSessionName) ?
+               this.HttpRequest.Session[UserIdSessionName] : null;
     }
 }

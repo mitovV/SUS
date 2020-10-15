@@ -13,19 +13,20 @@
         public static async Task CreateHostAsync(IMvcApplication application, int port = 80)
         {
             var routeTable = new List<Route>();
+            IServiceCollection serviceCollection = new ServiceCollection();
+
+            application.ConfigureServices(serviceCollection);
+            application.Configure(routeTable);
 
             AutoRegisterStaticFiles(routeTable);
-            AutoRegisterRoutes(routeTable, application);
-
-            application.ConfigureServices();
-            application.Configure(routeTable);
+            AutoRegisterRoutes(routeTable, application, serviceCollection);
 
             var httpServer = new HttpServer(routeTable);
 
             await httpServer.StartAsync(port);
         }
 
-        private static void AutoRegisterRoutes(List<Route> routeTable, IMvcApplication application)
+        private static void AutoRegisterRoutes(List<Route> routeTable, IMvcApplication application, IServiceCollection serviceCollection)
         {
             var controllerTypes = application
                 .GetType()
@@ -66,7 +67,7 @@
 
                     var route = new Route(url, httpMethod, (reques) =>
                      {
-                         var instance = Activator.CreateInstance(controllerType) as Controller;
+                         var instance = serviceCollection.CreateInstance(controllerType) as Controller;
                          instance.HttpRequest = reques;
                          var response = method.Invoke(instance, new object[] {  }) as HttpResponse;
 

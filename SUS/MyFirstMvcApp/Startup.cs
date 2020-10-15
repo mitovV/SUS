@@ -11,7 +11,7 @@
         {
         }
 
-        public void ConfigureServices()
+        public void ConfigureServices(IServiceCollection serviceCollection)
         {
         }
     }
