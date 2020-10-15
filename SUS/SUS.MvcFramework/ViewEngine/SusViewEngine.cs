@@ -14,11 +14,11 @@
     {
         private const string AtSign = "@";
 
-        public string GetHtml(string templateCode, object viewModel)
+        public string GetHtml(string templateCode, object viewModel, string user)
         {
             var csharpCode = GenerateCSharpFromTamplate(templateCode, viewModel);
             var executableObject = GenerateExecutableObject(csharpCode, viewModel);
-            var html = executableObject.ExecuteTemplate(viewModel);
+            var html = executableObject.ExecuteTemplate(viewModel, user);
 
             return html;
         }
@@ -52,8 +52,9 @@ namespace ViewNamespace
 {
     public class ViewClass : IView
     {
-        public string ExecuteTemplate(object viewModel)
+        public string ExecuteTemplate(object viewModel, string user)
         {
+            var User = user;
             var Model = viewModel as " + typeOfModel + @";
             var html = new StringBuilder();
 
